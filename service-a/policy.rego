@@ -4,12 +4,14 @@ import data.common.authz
 default allow := false
 
 allow if {
-    not authz.deny_weekend
-    input.method == "DELETE"
-    input.role in {"admin", "user"}
+    not authz.deny_weekend
+    input.method == "DELETE"
+    input.role == "admin"
 }
 
 allow if {
-    not authz.deny_weekend
-    input.method == "GET"
+    not authz.deny_weekend
+    input.method == "GET"
 }
+
+soyle bir rego dosyam var, bunda user role'une de delete izni verelim.
