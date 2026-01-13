@@ -7,7 +7,7 @@ allow if {
     not authz.deny_weekend
     input.method == "DELETE"
     # Rol admin VEYA user ise izin ver
-    input.role in {"admin", "user"}
+    input.role in {"admin"}
 }
 
 allow if {
