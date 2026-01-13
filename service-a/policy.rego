@@ -13,5 +13,3 @@ allow if {
     not authz.deny_weekend
     input.method == "GET"
 }
-
-soyle bir rego dosyam var, bunda user role'une de delete izni verelim.
