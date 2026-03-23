@@ -7,7 +7,7 @@ default decision := "REJECTED"
 valid_action_types := {"SCALE_OUT", "SCALE_IN", "RESTART", "UPDATE_CONFIG"}
 
 has_conflict if {
-    count(input.activeIntents) > 5
+    count(input.activeIntents) > 0
 }
 
 # ESCALATED: DELETE action requires manual approval
