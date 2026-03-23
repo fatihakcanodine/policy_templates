@@ -2,7 +2,6 @@ package mace.intent.evaluate
 
 import future.keywords.if
 
-# Test 1: ACCEPTED - SCALE_OUT with empty activeIntents
 test_accepted_no_conflict if {
     result.decision == "ACCEPTED" with input as {
         "incomingIntent": {"actionType": "SCALE_OUT"},
@@ -14,7 +13,6 @@ test_accepted_no_conflict if {
     }
 }
 
-# Test 2: DEFERRED - SCALE_OUT with existing intent (conflict)
 test_deferred_with_conflict if {
     result.decision == "DEFERRED" with input as {
         "incomingIntent": {"actionType": "SCALE_OUT"},
@@ -26,7 +24,6 @@ test_deferred_with_conflict if {
     }
 }
 
-# Test 3: ESCALATED - DELETE action
 test_escalated_delete if {
     result.decision == "ESCALATED" with input as {
         "incomingIntent": {"actionType": "DELETE"},
@@ -38,7 +35,6 @@ test_escalated_delete if {
     }
 }
 
-# Test 4: REJECTED - Invalid action type
 test_rejected_invalid if {
     result.decision == "REJECTED" with input as {
         "incomingIntent": {"actionType": "INVALID"},
