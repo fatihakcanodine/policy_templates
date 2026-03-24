@@ -47,6 +47,17 @@ known_source if {
     source_permissions[input.incomingIntent.source]
 }
 
+# Helper: replicas within limits or not specified
+replicas_valid if {
+    not target_replicas
+}
+
+replicas_valid if {
+    target_replicas
+    input.incomingIntent.desiredState.target_replicas >= min_replicas
+    input.incomingIntent.desiredState.target_replicas <= max_replicas
+}
+
 # ============================================
 # SCENARIO 1: RESOURCE LIMITS
 # ============================================
@@ -131,20 +142,14 @@ reason := "Action type DELETE requires manual escalation" if {
 decision := "DEFERRED" if {
     valid_action_types[input.incomingIntent.actionType]
     source_authorized
-    not target_replicas or (
-        input.incomingIntent.desiredState.target_replicas >= min_replicas
-        input.incomingIntent.desiredState.target_replicas <= max_replicas
-    )
+    replicas_valid
     has_conflict
 }
 
 reason := "Intent deferred due to conflicting active intents" if {
     valid_action_types[input.incomingIntent.actionType]
     source_authorized
-    not target_replicas or (
-        input.incomingIntent.desiredState.target_replicas >= min_replicas
-        input.incomingIntent.desiredState.target_replicas <= max_replicas
-    )
+    replicas_valid
     has_conflict
 }
 
@@ -153,20 +158,14 @@ decision := "ACCEPTED" if {
     valid_action_types[input.incomingIntent.actionType]
     source_authorized
     not has_conflict
-    not target_replicas or (
-        input.incomingIntent.desiredState.target_replicas >= min_replicas
-        input.incomingIntent.desiredState.target_replicas <= max_replicas
-    )
+    replicas_valid
 }
 
 reason := "Intent accepted for processing" if {
     valid_action_types[input.incomingIntent.actionType]
     source_authorized
     not has_conflict
-    not target_replicas or (
-        input.incomingIntent.desiredState.target_replicas >= min_replicas
-        input.incomingIntent.desiredState.target_replicas <= max_replicas
-    )
+    replicas_valid
 }
 
 # REJECTED: Invalid action type
