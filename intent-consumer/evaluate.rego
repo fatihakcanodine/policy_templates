@@ -9,7 +9,7 @@ import future.keywords.if
 valid_action_types := {"SCALE_OUT", "SCALE_IN", "RESTART", "UPDATE_CONFIG"}
 
 # Resource Limits
-max_replicas := 10
+max_replicas := 15
 min_replicas := 1
 
 # Source Authorization Map
