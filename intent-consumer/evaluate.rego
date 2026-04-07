@@ -9,7 +9,7 @@ import future.keywords.if
 valid_action_types := {"SCALE_OUT", "SCALE_IN", "RESTART", "TEST"}
 
 min_replicas := 1
-max_replicas := 10
+max_replicas := 15
 
 source_permissions := {
 	"AI_AGENT": {"SCALE_OUT", "SCALE_IN"},
