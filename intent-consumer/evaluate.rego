@@ -6,7 +6,7 @@ import future.keywords.if
 # CONFIGURATION
 # ============================================
 
-valid_action_types := {"SCALE_OUT", "SCALE_IN", "RESTART"}
+valid_action_types := {"SCALE_OUT", "SCALE_IN", "RESTART", "TEST"}
 
 min_replicas := 1
 max_replicas := 10
