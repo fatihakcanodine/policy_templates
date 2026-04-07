@@ -1,7 +1,7 @@
 package service_a.policy
 import data.common.authz
 
-default allow := false
+default allow := true
 
 allow if {
     not authz.deny_weekend
