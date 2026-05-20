@@ -1,0 +1,4 @@
+{
+  "max_replicas": 15,
+  "allowed_actions": ["scale_out", "scale_in", "restart_workload", "config_update"]
+}

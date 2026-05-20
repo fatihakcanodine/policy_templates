@@ -1,0 +1,7 @@
+{
+  "scale_out":        {"executor": "cnf-manager", "scope": "GLOBAL"},
+  "scale_in":         {"executor": "cnf-manager", "scope": "GLOBAL"},
+  "restart_workload": {"executor": "cnf-manager", "scope": "GLOBAL"},
+  "config_update":    {"executor": "cnf-manager", "scope": "GLOBAL"},
+  "drain_node":       {"executor": "cnf-manager", "scope": "GLOBAL"}
+}

@@ -1,0 +1,6 @@
+{
+  "notify":           {"executor": "obs",          "scope": "LOCAL"},
+  "open_ticket":      {"executor": "itsm-manager", "scope": "GLOBAL"},
+  "suppress_alarm":   {"executor": "obs",          "scope": "GLOBAL"},
+  "audit_flag":       {"executor": "obs",          "scope": "LOCAL"}
+}
