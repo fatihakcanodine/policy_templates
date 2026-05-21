@@ -89,14 +89,14 @@ get_effect_config(effect_type) := {"base_risk": 0, "cooldown_seconds": 0, "actio
 	not data.mace.platform.effect_taxonomy[effect_type]
 }
 
-coalesce_num(val, default) := val if { is_number(val) }
-coalesce_num(val, default) := default if { not is_number(val) }
+coalesce_num(val, fallback) := val if { is_number(val) }
+coalesce_num(val, fallback) := fallback if { not is_number(val) }
 
-coalesce_str(val, default) := val if { is_string(val) }
-coalesce_str(val, default) := default if { not is_string(val) }
+coalesce_str(val, fallback) := val if { is_string(val) }
+coalesce_str(val, fallback) := fallback if { not is_string(val) }
 
-coalesce_map(val, default) := val if { is_object(val) }
-coalesce_map(val, default) := default if { not is_object(val) }
+coalesce_map(val, fallback) := val if { is_object(val) }
+coalesce_map(val, fallback) := fallback if { not is_object(val) }
 
 # -------------------------------------------
 # Action authorization check

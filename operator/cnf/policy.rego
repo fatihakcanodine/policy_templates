@@ -33,11 +33,11 @@ always_succeed_types := {"notify", "allow", "open_ticket"}
 # Helpers
 # -------------------------------------------
 
-coalesce_num(val, default) := val if { is_number(val) }
-coalesce_num(val, default) := default if { not is_number(val) }
+coalesce_num(val, fallback) := val if { is_number(val) }
+coalesce_num(val, fallback) := fallback if { not is_number(val) }
 
-coalesce_str(val, default) := val if { is_string(val) }
-coalesce_str(val, default) := default if { not is_string(val) }
+coalesce_str(val, fallback) := val if { is_string(val) }
+coalesce_str(val, fallback) := fallback if { not is_string(val) }
 
 # Is this effect known to any routing?
 exec_known_effect if {
