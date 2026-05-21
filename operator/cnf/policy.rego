@@ -87,16 +87,16 @@ exec_status := "SUCCEEDED" if {
 	exec_bypass_priority
 }
 
-# Always-succeed types
+# Always-succeed types (even if not in routing tables)
 exec_status := "SUCCEEDED" if {
-	exec_known_effect
 	exec_always_succeed
 }
 
-# Unknown effect -> FAIL
+# Unknown effect -> FAIL (only for non-always-succeed types)
 exec_status := "FAILED" if {
 	input.effect_type
 	not exec_known_effect
+	not exec_always_succeed
 }
 
 # Default: succeed
@@ -114,6 +114,7 @@ default exec_status := "SUCCEEDED"
 exec_reason := sprintf("Unknown effect type: %s — execution rejected", [coalesce_str(input.effect_type, "none")]) if {
 	input.effect_type
 	not exec_known_effect
+	not exec_always_succeed
 }
 
 exec_reason := sprintf("Risk score %d exceeds execution threshold %d — effect rejected", [
@@ -134,7 +135,6 @@ exec_reason := sprintf("Critical priority bypasses risk score %d for %s", [
 }
 
 exec_reason := sprintf("%s is a low-risk effect type — auto-succeed", [input.effect_type]) if {
-	exec_known_effect
 	exec_always_succeed
 }
 

@@ -40,7 +40,7 @@ mock_domain_routing := {
 # -------------------------------------------
 
 execute_with_mocks(effect_input) := result if {
-	result := mace.cnf.operator.execute
+	result := data.mace.cnf.operator.execute
 		with input as effect_input
 		with data.mace.cnf.operator.limits as mock_limits
 		with data.mace.platform.effect_routing as mock_platform_routing

@@ -54,7 +54,7 @@ mock_tenants := {
 	"enterprise-x": {
 		"constraints": {
 			"max_replicas": 10,
-			"allowed_actions": ["scale_out", "scale_in", "config_update"],
+			"allowed_actions": ["scale_out", "scale_in", "config_update", "restart_workload", "drain_node"],
 		},
 	},
 	"enterprise-y": {
@@ -70,7 +70,7 @@ mock_tenants := {
 # -------------------------------------------
 
 evaluate_with_mocks(action_input) := result if {
-	result := mace.cnf.domain.evaluate
+	result := data.mace.cnf.domain.evaluate
 		with input as action_input
 		with data.mace.platform.effect_routing as mock_platform_routing
 		with data.mace.platform.effect_taxonomy as mock_taxonomy

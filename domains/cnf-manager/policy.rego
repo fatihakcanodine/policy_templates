@@ -143,79 +143,79 @@ replica_within_limits(target) if {
 effect["scale_out"] := {
 	"effect_type": "scale_out",
 	"scope": effect_scope("scale_out"),
-	"effect_key": sprintf("%s:%s", [coalesce_str(input.tenant_id, "default"), coalesce_str(input.target_ref, "unknown")]),
+	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
 	"priority": get_priority,
 	"risk_score": get_effect_config("scale_out").base_risk,
 	"cooldown_seconds": get_effect_config("scale_out").cooldown_seconds,
 	"action_class": get_effect_config("scale_out").action_class,
 	"effect_params": {
-		"target_replicas": coalesce_num(input.target_replicas, 3),
+		"target_replicas": object.get(input, "target_replicas", 3),
 	},
 } if {
 	input.action == "scale_out"
 	action_is_authorized
-	replica_within_limits(coalesce_num(input.target_replicas, 3))
+	replica_within_limits(object.get(input, "target_replicas", 3))
 }
 
 # SCALE_OUT — denied due to replica limits
 effect["scale_out_denied_replicas"] := {
 	"effect_type": "deny",
 	"scope": "LOCAL",
-	"effect_key": sprintf("%s:%s", [coalesce_str(input.tenant_id, "default"), coalesce_str(input.target_ref, "unknown")]),
+	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
 	"priority": "normal",
 	"risk_score": 10,
 	"cooldown_seconds": 0,
 	"action_class": "NON_DISRUPTIVE",
 	"effect_params": {
-		"reason": sprintf("scale_out denied: target_replicas %d exceeds tenant or operator limits", [coalesce_num(input.target_replicas, 3)]),
+		"reason": sprintf("scale_out denied: target_replicas %d exceeds tenant or operator limits", [object.get(input, "target_replicas", 3)]),
 	},
 } if {
 	input.action == "scale_out"
 	action_is_authorized
-	not replica_within_limits(coalesce_num(input.target_replicas, 3))
+	not replica_within_limits(object.get(input, "target_replicas", 3))
 }
 
 # SCALE_IN
 effect["scale_in"] := {
 	"effect_type": "scale_in",
 	"scope": effect_scope("scale_in"),
-	"effect_key": sprintf("%s:%s", [coalesce_str(input.tenant_id, "default"), coalesce_str(input.target_ref, "unknown")]),
+	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
 	"priority": get_priority,
 	"risk_score": get_effect_config("scale_in").base_risk,
 	"cooldown_seconds": get_effect_config("scale_in").cooldown_seconds,
 	"action_class": get_effect_config("scale_in").action_class,
 	"effect_params": {
-		"target_replicas": coalesce_num(input.target_replicas, 1),
+		"target_replicas": object.get(input, "target_replicas", 1),
 	},
 } if {
 	input.action == "scale_in"
 	action_is_authorized
-	replica_within_limits(coalesce_num(input.target_replicas, 1))
+	replica_within_limits(object.get(input, "target_replicas", 1))
 }
 
 # SCALE_IN — denied due to replica limits
 effect["scale_in_denied_replicas"] := {
 	"effect_type": "deny",
 	"scope": "LOCAL",
-	"effect_key": sprintf("%s:%s", [coalesce_str(input.tenant_id, "default"), coalesce_str(input.target_ref, "unknown")]),
+	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
 	"priority": "normal",
 	"risk_score": 10,
 	"cooldown_seconds": 0,
 	"action_class": "NON_DISRUPTIVE",
 	"effect_params": {
-		"reason": sprintf("scale_in denied: target_replicas %d exceeds tenant or operator limits", [coalesce_num(input.target_replicas, 1)]),
+		"reason": sprintf("scale_in denied: target_replicas %d exceeds tenant or operator limits", [object.get(input, "target_replicas", 1)]),
 	},
 } if {
 	input.action == "scale_in"
 	action_is_authorized
-	not replica_within_limits(coalesce_num(input.target_replicas, 1))
+	not replica_within_limits(object.get(input, "target_replicas", 1))
 }
 
 # RESTART_WORKLOAD
 effect["restart_workload"] := {
 	"effect_type": "restart_workload",
 	"scope": effect_scope("restart_workload"),
-	"effect_key": sprintf("%s:%s", [coalesce_str(input.tenant_id, "default"), coalesce_str(input.target_ref, "unknown")]),
+	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
 	"priority": get_priority,
 	"risk_score": get_effect_config("restart_workload").base_risk,
 	"cooldown_seconds": get_effect_config("restart_workload").cooldown_seconds,
@@ -230,7 +230,7 @@ effect["restart_workload"] := {
 effect["drain_node"] := {
 	"effect_type": "drain_node",
 	"scope": effect_scope("drain_node"),
-	"effect_key": sprintf("%s:%s", [coalesce_str(input.tenant_id, "default"), coalesce_str(input.target_ref, "unknown")]),
+	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
 	"priority": get_priority,
 	"risk_score": get_effect_config("drain_node").base_risk,
 	"cooldown_seconds": get_effect_config("drain_node").cooldown_seconds,
@@ -245,13 +245,13 @@ effect["drain_node"] := {
 effect["config_update"] := {
 	"effect_type": "config_update",
 	"scope": effect_scope("config_update"),
-	"effect_key": sprintf("%s:%s", [coalesce_str(input.tenant_id, "default"), coalesce_str(input.target_ref, "unknown")]),
+	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
 	"priority": get_priority,
 	"risk_score": get_effect_config("config_update").base_risk,
 	"cooldown_seconds": get_effect_config("config_update").cooldown_seconds,
 	"action_class": get_effect_config("config_update").action_class,
 	"effect_params": {
-		"config_payload": coalesce_map(input.config_payload, {}),
+		"config_payload": object.get(input, "config_payload", {}),
 	},
 } if {
 	input.action == "config_update"
@@ -262,13 +262,13 @@ effect["config_update"] := {
 effect["notify"] := {
 	"effect_type": "notify",
 	"scope": effect_scope("notify"),
-	"effect_key": sprintf("%s:%s", [coalesce_str(input.tenant_id, "default"), coalesce_str(input.target_ref, "unknown")]),
+	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
 	"priority": get_priority,
 	"risk_score": 0,
 	"cooldown_seconds": 0,
 	"action_class": "NON_DISRUPTIVE",
 	"effect_params": {
-		"message": sprintf("Notification for action %s on %s", [coalesce_str(input.action, "unknown"), coalesce_str(input.target_ref, "unknown")]),
+		"message": sprintf("Notification for action %s on %s", [object.get(input, "action", "unknown"), object.get(input, "target_ref", "unknown")]),
 	},
 } if {
 	input.action == "notify"
@@ -278,7 +278,7 @@ effect["notify"] := {
 effect["allow"] := {
 	"effect_type": "allow",
 	"scope": "LOCAL",
-	"effect_key": sprintf("%s:%s", [coalesce_str(input.tenant_id, "default"), coalesce_str(input.target_ref, "unknown")]),
+	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
 	"priority": get_priority,
 	"risk_score": 0,
 	"cooldown_seconds": 0,
@@ -289,20 +289,21 @@ effect["allow"] := {
 }
 
 # Action not authorized for this tenant -> deny
+# Only applies to domain-managed actions (not platform pass-throughs like notify/allow)
 effect["deny_unauthorized"] := {
 	"effect_type": "deny",
 	"scope": "LOCAL",
-	"effect_key": sprintf("%s:%s", [coalesce_str(input.tenant_id, "default"), coalesce_str(input.target_ref, "unknown")]),
+	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
 	"priority": "normal",
 	"risk_score": 10,
 	"cooldown_seconds": 0,
 	"action_class": "NON_DISRUPTIVE",
 	"effect_params": {
-		"reason": sprintf("Action %s not authorized for tenant %s", [input.action, coalesce_str(input.tenant_id, "unknown")]),
+		"reason": sprintf("Action %s not authorized for tenant %s", [input.action, object.get(input, "tenant_id", "unknown")]),
 	},
 } if {
 	input.action
-	resolved_routing[input.action]
+	data.mace.cnf.domain.effect_routing[input.action]
 	tenant_constraints.allowed_actions
 	not input.action in tenant_constraints.allowed_actions
 }
@@ -311,18 +312,17 @@ effect["deny_unauthorized"] := {
 effect["deny_unknown"] := {
 	"effect_type": "deny",
 	"scope": "LOCAL",
-	"effect_key": sprintf("%s:%s", [coalesce_str(input.tenant_id, "default"), coalesce_str(input.target_ref, "unknown")]),
+	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
 	"priority": "normal",
 	"risk_score": 10,
 	"cooldown_seconds": 0,
 	"action_class": "NON_DISRUPTIVE",
 	"effect_params": {
-		"reason": sprintf("Unknown action: %s — fail-closed", [coalesce_str(input.action, "none")]),
+		"reason": sprintf("Unknown action: %s — fail-closed", [object.get(input, "action", "none")]),
 	},
 } if {
 	input.action
 	not resolved_routing[input.action]
-	not tenant_constraints.allowed_actions
 }
 
 # -------------------------------------------
@@ -336,7 +336,7 @@ effects := [e |
 
 evaluate := {
 	"effects": effects,
-	"source": coalesce_str(input.source, "unknown"),
-	"tenant_id": coalesce_str(input.tenant_id, "default"),
-	"incident_id": coalesce_str(input.incident_id, ""),
+	"source": object.get(input, "source", "unknown"),
+	"tenant_id": object.get(input, "tenant_id", "default"),
+	"incident_id": object.get(input, "incident_id", ""),
 }
