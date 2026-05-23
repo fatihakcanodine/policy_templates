@@ -58,18 +58,24 @@ operator_limits := data.mace.cnf.operator.limits
 # Helpers
 # -------------------------------------------
 
-get_priority := input.priority if {
+get_priority := data.mace.platform.priority_levels[lower_prio] if {
 	input.priority
-	data.mace.platform.priority_levels[input.priority]
+	lower_prio := lower(input.priority)
+	data.mace.platform.priority_levels[lower_prio]
 }
 
-get_priority := "normal" if {
+get_priority := 5 if {
 	not input.priority
 }
 
-get_priority := "normal" if {
+get_priority := 5 if {
 	input.priority
-	not data.mace.platform.priority_levels[input.priority]
+	lower_prio := lower(input.priority)
+	not data.mace.platform.priority_levels[lower_prio]
+}
+
+get_priority := 5 if {
+	not data.mace.platform.priority_levels
 }
 
 effect_scope(effect_type) := scope if {
@@ -339,4 +345,5 @@ evaluate := {
 	"source": object.get(input, "source", "unknown"),
 	"tenant_id": object.get(input, "tenant_id", "default"),
 	"incident_id": object.get(input, "incident_id", ""),
+	"policy_revision": object.get(data.mace.cnf.domain.meta, "policy_revision", "unknown"),
 }

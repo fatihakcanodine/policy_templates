@@ -1,0 +1,13 @@
+{
+  "scale_out":        {"base_risk": 20, "cooldown_seconds": 300,  "action_class": "NON_DISRUPTIVE"},
+  "scale_in":         {"base_risk": 40, "cooldown_seconds": 300,  "action_class": "NON_DISRUPTIVE"},
+  "restart_workload": {"base_risk": 60, "cooldown_seconds": 600,  "action_class": "DISRUPTIVE_BOUNDED"},
+  "drain_node":       {"base_risk": 80, "cooldown_seconds": 1800, "action_class": "DISRUPTIVE_UNBOUNDED"},
+  "config_update":    {"base_risk": 30, "cooldown_seconds": 300,  "action_class": "NON_DISRUPTIVE"},
+  "notify":           {"base_risk": 0,  "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"},
+  "allow":            {"base_risk": 0,  "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"},
+  "deny":             {"base_risk": 0,  "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"},
+  "open_ticket":      {"base_risk": 5,  "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"},
+  "suppress_alarm":   {"base_risk": 5,  "cooldown_seconds": 60,   "action_class": "NON_DISRUPTIVE"},
+  "audit_flag":       {"base_risk": 0,  "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"}
+}

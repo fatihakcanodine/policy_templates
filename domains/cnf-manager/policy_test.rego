@@ -42,7 +42,7 @@ mock_taxonomy := {
 	"allow":              {"base_risk": 0,  "cooldown_seconds": 0,   "action_class": "NON_DISRUPTIVE"},
 }
 
-mock_priority_levels := {"critical": 200, "high": 100, "normal": 50, "low": 25}
+mock_priority_levels := {"critical": 1, "high": 2, "normal": 5, "medium": 5, "low": 10}
 
 mock_operator_limits := {
 	"max_replicas_per_tenant": 20,
@@ -69,6 +69,8 @@ mock_tenants := {
 # Helper: evaluate with full mock context
 # -------------------------------------------
 
+mock_meta := {"policy_revision": "test-1.0.0"}
+
 evaluate_with_mocks(action_input) := result if {
 	result := data.mace.cnf.domain.evaluate
 		with input as action_input
@@ -76,6 +78,7 @@ evaluate_with_mocks(action_input) := result if {
 		with data.mace.platform.effect_taxonomy as mock_taxonomy
 		with data.mace.platform.priority_levels as mock_priority_levels
 		with data.mace.cnf.domain.effect_routing as mock_domain_routing
+		with data.mace.cnf.domain.meta as mock_meta
 		with data.mace.cnf.operator.limits as mock_operator_limits
 		with data.mace.cnf.tenants as mock_tenants
 }
@@ -205,7 +208,7 @@ test_restart_workload if {
 	e.scope == "GLOBAL"
 	e.risk_score == 70
 	e.action_class == "DISRUPTIVE_UNBOUNDED"
-	e.priority == "high"
+	e.priority == 2
 }
 
 # -------------------------------------------
@@ -225,7 +228,7 @@ test_drain_node if {
 	e.effect_type == "drain_node"
 	e.scope == "GLOBAL"
 	e.risk_score == 80
-	e.priority == "critical"
+	e.priority == 1
 }
 
 # -------------------------------------------
@@ -341,7 +344,7 @@ test_critical_priority if {
 		"priority": "critical",
 	})
 	e := eval.effects[0]
-	e.priority == "critical"
+	e.priority == 1
 }
 
 test_default_priority if {
@@ -354,5 +357,17 @@ test_default_priority if {
 		"priority": "unknown_priority",
 	})
 	e := eval.effects[0]
-	e.priority == "normal"
+	e.priority == 5
+}
+
+test_evaluate_has_policy_revision if {
+	eval := evaluate_with_mocks({
+		"action": "scale_out",
+		"tenant_id": "enterprise-x",
+		"incident_id": "inc-1",
+		"source": "test-source",
+		"target_ref": "cluster-1/ns-1/pod-1",
+		"priority": "normal",
+	})
+	eval.policy_revision == "test-1.0.0"
 }

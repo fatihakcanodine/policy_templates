@@ -138,10 +138,10 @@ exec_reason := sprintf("%s is a low-risk effect type — auto-succeed", [input.e
 	exec_always_succeed
 }
 
-exec_reason := sprintf("Effect %s executed successfully (risk=%d, priority=%s)", [
+exec_reason := sprintf("Effect %s executed successfully (risk=%d, priority=%v)", [
 	input.effect_type,
 	coalesce_num(input.risk_score, 0),
-	coalesce_str(input.priority, "normal"),
+	input.priority,
 ]) if {
 	exec_known_effect
 	not exec_high_risk

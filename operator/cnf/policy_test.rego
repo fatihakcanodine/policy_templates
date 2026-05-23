@@ -17,7 +17,7 @@ import future.keywords.if
 mock_limits := {
 	"max_replicas_per_tenant": 20,
 	"max_risk_score": 90,
-	"bypass_priorities": ["critical"],
+	"bypass_priorities": [1],
 }
 
 mock_platform_routing := {
@@ -174,7 +174,7 @@ test_critical_bypasses_risk if {
 		"tenant_id": "enterprise-x",
 		"plan_id": "plan-1",
 		"incident_id": "inc-1",
-		"priority": "critical",
+		"priority": 1,
 		"risk_score": 95,
 	})
 	result.status == "SUCCEEDED"
@@ -257,7 +257,7 @@ test_reason_for_critical_bypass if {
 		"tenant_id": "enterprise-x",
 		"plan_id": "plan-1",
 		"incident_id": "inc-1",
-		"priority": "critical",
+		"priority": 1,
 		"risk_score": 95,
 	})
 	result.status == "SUCCEEDED"
