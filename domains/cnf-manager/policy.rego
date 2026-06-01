@@ -58,23 +58,33 @@ operator_limits := data.mace.cnf.operator.limits
 # Helpers
 # -------------------------------------------
 
+# Integer priority: pass through directly (already resolved by caller)
+get_priority := input.priority if {
+	is_number(input.priority)
+}
+
+# String priority: resolve label → int via priority_levels data
 get_priority := data.mace.platform.priority_levels[lower_prio] if {
-	input.priority
+	is_string(input.priority)
 	lower_prio := lower(input.priority)
 	data.mace.platform.priority_levels[lower_prio]
 }
 
+# No priority provided: default normal (5)
 get_priority := 5 if {
 	not input.priority
 }
 
+# Unknown string label (not in priority_levels): default normal (5)
 get_priority := 5 if {
-	input.priority
+	is_string(input.priority)
 	lower_prio := lower(input.priority)
 	not data.mace.platform.priority_levels[lower_prio]
 }
 
+# Platform bundle not loaded: default normal (5)
 get_priority := 5 if {
+	is_string(input.priority)
 	not data.mace.platform.priority_levels
 }
 
@@ -168,7 +178,7 @@ effect["scale_out_denied_replicas"] := {
 	"effect_type": "deny",
 	"scope": "LOCAL",
 	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
-	"priority": "normal",
+	"priority": 5,
 	"risk_score": 10,
 	"cooldown_seconds": 0,
 	"action_class": "NON_DISRUPTIVE",
@@ -204,7 +214,7 @@ effect["scale_in_denied_replicas"] := {
 	"effect_type": "deny",
 	"scope": "LOCAL",
 	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
-	"priority": "normal",
+	"priority": 5,
 	"risk_score": 10,
 	"cooldown_seconds": 0,
 	"action_class": "NON_DISRUPTIVE",
@@ -300,7 +310,7 @@ effect["deny_unauthorized"] := {
 	"effect_type": "deny",
 	"scope": "LOCAL",
 	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
-	"priority": "normal",
+	"priority": 5,
 	"risk_score": 10,
 	"cooldown_seconds": 0,
 	"action_class": "NON_DISRUPTIVE",
@@ -319,7 +329,7 @@ effect["deny_unknown"] := {
 	"effect_type": "deny",
 	"scope": "LOCAL",
 	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
-	"priority": "normal",
+	"priority": 5,
 	"risk_score": 10,
 	"cooldown_seconds": 0,
 	"action_class": "NON_DISRUPTIVE",
