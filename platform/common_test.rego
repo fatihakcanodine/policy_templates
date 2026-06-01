@@ -35,19 +35,26 @@ test_effect_taxonomy_allow if {
 
 # --- Priority Levels ---
 test_get_priority_valid if {
-	get_priority("critical") == "critical"
-	get_priority("normal") == "normal"
+	get_priority("critical") == 1
+	get_priority("high") == 2
+	get_priority("normal") == 5
+	get_priority("low") == 10
 }
 
 test_get_priority_invalid_falls_back if {
-	get_priority("unknown") == "normal"
+	get_priority("unknown") == 5
+}
+
+test_get_priority_int_passthrough if {
+	get_priority(3) == 3
 }
 
 test_priority_levels_values if {
-	priority_levels["critical"] == 200
-	priority_levels["high"] == 100
-	priority_levels["normal"] == 50
-	priority_levels["low"] == 25
+	priority_levels["critical"] == 1
+	priority_levels["high"] == 2
+	priority_levels["normal"] == 5
+	priority_levels["medium"] == 5
+	priority_levels["low"] == 10
 }
 
 # --- Coalesce Helpers ---

@@ -14,32 +14,47 @@ import future.keywords.if
 # -------------------------------------------
 
 effect_taxonomy := {
-	"scale_out":          {"base_risk": 30, "cooldown_seconds": 300, "action_class": "DISRUPTIVE_BOUNDED"},
-	"scale_in":           {"base_risk": 50, "cooldown_seconds": 300, "action_class": "DISRUPTIVE_BOUNDED"},
-	"restart_workload":   {"base_risk": 70, "cooldown_seconds": 600, "action_class": "DISRUPTIVE_UNBOUNDED"},
-	"drain_node":         {"base_risk": 80, "cooldown_seconds": 900, "action_class": "DISRUPTIVE_UNBOUNDED"},
-	"config_update":      {"base_risk": 20, "cooldown_seconds": 60,  "action_class": "NON_DISRUPTIVE"},
-	"notify":             {"base_risk": 0,  "cooldown_seconds": 0,   "action_class": "NON_DISRUPTIVE"},
-	"deny":               {"base_risk": 10, "cooldown_seconds": 0,   "action_class": "NON_DISRUPTIVE"},
-	"allow":              {"base_risk": 0,  "cooldown_seconds": 0,   "action_class": "NON_DISRUPTIVE"},
+	"scale_out":          {"base_risk": 30, "cooldown_seconds": 300,  "action_class": "DISRUPTIVE_BOUNDED"},
+	"scale_in":           {"base_risk": 50, "cooldown_seconds": 300,  "action_class": "DISRUPTIVE_BOUNDED"},
+	"restart_workload":   {"base_risk": 70, "cooldown_seconds": 600,  "action_class": "DISRUPTIVE_UNBOUNDED"},
+	"drain_node":         {"base_risk": 80, "cooldown_seconds": 900,  "action_class": "DISRUPTIVE_UNBOUNDED"},
+	"config_update":      {"base_risk": 20, "cooldown_seconds": 60,   "action_class": "NON_DISRUPTIVE"},
+	"notify":             {"base_risk": 0,  "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"},
+	"deny":               {"base_risk": 10, "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"},
+	"allow":              {"base_risk": 0,  "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"},
+	"open_ticket":        {"base_risk": 5,  "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"},
+	"suppress_alarm":     {"base_risk": 5,  "cooldown_seconds": 60,   "action_class": "NON_DISRUPTIVE"},
+	"audit_flag":         {"base_risk": 0,  "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"},
 }
 
 # -------------------------------------------
 # Priority Levels
 # -------------------------------------------
 
-priority_levels := {"critical": 200, "high": 100, "normal": 50, "low": 25}
+priority_levels := {"critical": 1, "high": 2, "normal": 5, "medium": 5, "low": 10}
 
 # -------------------------------------------
 # Helpers: Resolve priority with fallback
 # -------------------------------------------
 
-get_priority(p) := p if {
-	priority_levels[p]
+get_priority(p) := priority_levels[lower_p] if {
+	is_string(p)
+	lower_p := lower(p)
+	priority_levels[lower_p]
 }
 
-get_priority(p) := "normal" if {
-	not priority_levels[p]
+get_priority(p) := p if {
+	is_number(p)
+}
+
+get_priority(p) := 5 if {
+	is_string(p)
+	lower_p := lower(p)
+	not priority_levels[lower_p]
+}
+
+get_priority(p) := 5 if {
+	not p
 }
 
 # -------------------------------------------
