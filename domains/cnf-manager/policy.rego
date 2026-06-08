@@ -115,6 +115,22 @@ coalesce_map(val, fallback) := val if { is_object(val) }
 coalesce_map(val, fallback) := fallback if { not is_object(val) }
 
 # -------------------------------------------
+# Deduplication-safe effect key
+# -------------------------------------------
+# Format: "<action>:<tenant_id>:<target_ref>"
+# Includes the action (== effect_type for every effect rule below) so that
+# different actions on the same target never collide in the Orchestrator's
+# deduplication step — e.g. scale_out must NOT dedup against restart_workload.
+# Invariant: effect_type == input.action for every effect rule here. If a future
+# rule emits an effect_type that differs from input.action, give that rule an
+# explicit literal key instead of this helper.
+dedup_effect_key := sprintf("%s:%s:%s", [
+	object.get(input, "action", "unknown"),
+	object.get(input, "tenant_id", "default"),
+	object.get(input, "target_ref", "unknown"),
+])
+
+# -------------------------------------------
 # Action authorization check
 # -------------------------------------------
 
@@ -159,7 +175,7 @@ replica_within_limits(target) if {
 effect["scale_out"] := {
 	"effect_type": "scale_out",
 	"scope": effect_scope("scale_out"),
-	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
+	"effect_key": dedup_effect_key,
 	"priority": get_priority,
 	"risk_score": get_effect_config("scale_out").base_risk,
 	"cooldown_seconds": get_effect_config("scale_out").cooldown_seconds,
@@ -177,7 +193,7 @@ effect["scale_out"] := {
 effect["scale_out_denied_replicas"] := {
 	"effect_type": "deny",
 	"scope": "LOCAL",
-	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
+	"effect_key": dedup_effect_key,
 	"priority": 5,
 	"risk_score": 10,
 	"cooldown_seconds": 0,
@@ -195,7 +211,7 @@ effect["scale_out_denied_replicas"] := {
 effect["scale_in"] := {
 	"effect_type": "scale_in",
 	"scope": effect_scope("scale_in"),
-	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
+	"effect_key": dedup_effect_key,
 	"priority": get_priority,
 	"risk_score": get_effect_config("scale_in").base_risk,
 	"cooldown_seconds": get_effect_config("scale_in").cooldown_seconds,
@@ -213,7 +229,7 @@ effect["scale_in"] := {
 effect["scale_in_denied_replicas"] := {
 	"effect_type": "deny",
 	"scope": "LOCAL",
-	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
+	"effect_key": dedup_effect_key,
 	"priority": 5,
 	"risk_score": 10,
 	"cooldown_seconds": 0,
@@ -231,7 +247,7 @@ effect["scale_in_denied_replicas"] := {
 effect["restart_workload"] := {
 	"effect_type": "restart_workload",
 	"scope": effect_scope("restart_workload"),
-	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
+	"effect_key": dedup_effect_key,
 	"priority": get_priority,
 	"risk_score": get_effect_config("restart_workload").base_risk,
 	"cooldown_seconds": get_effect_config("restart_workload").cooldown_seconds,
@@ -246,7 +262,7 @@ effect["restart_workload"] := {
 effect["drain_node"] := {
 	"effect_type": "drain_node",
 	"scope": effect_scope("drain_node"),
-	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
+	"effect_key": dedup_effect_key,
 	"priority": get_priority,
 	"risk_score": get_effect_config("drain_node").base_risk,
 	"cooldown_seconds": get_effect_config("drain_node").cooldown_seconds,
@@ -261,7 +277,7 @@ effect["drain_node"] := {
 effect["config_update"] := {
 	"effect_type": "config_update",
 	"scope": effect_scope("config_update"),
-	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
+	"effect_key": dedup_effect_key,
 	"priority": get_priority,
 	"risk_score": get_effect_config("config_update").base_risk,
 	"cooldown_seconds": get_effect_config("config_update").cooldown_seconds,
@@ -278,7 +294,7 @@ effect["config_update"] := {
 effect["notify"] := {
 	"effect_type": "notify",
 	"scope": effect_scope("notify"),
-	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
+	"effect_key": dedup_effect_key,
 	"priority": get_priority,
 	"risk_score": 0,
 	"cooldown_seconds": 0,
@@ -294,7 +310,7 @@ effect["notify"] := {
 effect["allow"] := {
 	"effect_type": "allow",
 	"scope": "LOCAL",
-	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
+	"effect_key": dedup_effect_key,
 	"priority": get_priority,
 	"risk_score": 0,
 	"cooldown_seconds": 0,
@@ -309,7 +325,7 @@ effect["allow"] := {
 effect["deny_unauthorized"] := {
 	"effect_type": "deny",
 	"scope": "LOCAL",
-	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
+	"effect_key": dedup_effect_key,
 	"priority": 5,
 	"risk_score": 10,
 	"cooldown_seconds": 0,
@@ -328,7 +344,7 @@ effect["deny_unauthorized"] := {
 effect["deny_unknown"] := {
 	"effect_type": "deny",
 	"scope": "LOCAL",
-	"effect_key": sprintf("%s:%s", [object.get(input, "tenant_id", "default"), object.get(input, "target_ref", "unknown")]),
+	"effect_key": dedup_effect_key,
 	"priority": 5,
 	"risk_score": 10,
 	"cooldown_seconds": 0,
