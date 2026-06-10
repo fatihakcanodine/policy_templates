@@ -35,6 +35,19 @@ resolved_routing := merged if {
 }
 
 # -------------------------------------------
+# Resolved taxonomy: platform + domain merged
+# -------------------------------------------
+# Platform provides common effects (notify, allow, deny, etc.)
+# Domain provides CNF-specific effects (scale_out, restart_workload, etc.)
+# Domain entries override platform entries of the same name.
+
+resolved_taxonomy := merged if {
+	platform_tax := data.mace.platform.effect_taxonomy
+	domain_tax := data.mace.cnf.domain.taxonomy
+	merged := object.union(platform_tax, domain_tax)
+}
+
+# -------------------------------------------
 # Resolved tenant constraints
 # -------------------------------------------
 
@@ -98,11 +111,11 @@ effect_scope(effect_type) := "LOCAL" if {
 }
 
 get_effect_config(effect_type) := config if {
-	config := data.mace.platform.effect_taxonomy[effect_type]
+	config := resolved_taxonomy[effect_type]
 }
 
 get_effect_config(effect_type) := {"base_risk": 0, "cooldown_seconds": 0, "action_class": "UNKNOWN"} if {
-	not data.mace.platform.effect_taxonomy[effect_type]
+	not resolved_taxonomy[effect_type]
 }
 
 coalesce_num(val, fallback) := val if { is_number(val) }

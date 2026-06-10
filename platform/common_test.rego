@@ -6,14 +6,7 @@ import future.keywords.if
 # PLATFORM — Shared Helper Tests
 # ============================================
 
-# --- Effect Taxonomy ---
-test_effect_taxonomy_scale_out if {
-	config := effect_taxonomy["scale_out"]
-	config.base_risk == 30
-	config.cooldown_seconds == 300
-	config.action_class == "DISRUPTIVE_BOUNDED"
-}
-
+# --- Effect Taxonomy (platform effects only) ---
 test_effect_taxonomy_notify if {
 	config := effect_taxonomy["notify"]
 	config.base_risk == 0
@@ -31,6 +24,43 @@ test_effect_taxonomy_allow if {
 	config := effect_taxonomy["allow"]
 	config.base_risk == 0
 	config.action_class == "NON_DISRUPTIVE"
+}
+
+test_effect_taxonomy_open_ticket if {
+	config := effect_taxonomy["open_ticket"]
+	config.base_risk == 5
+	config.cooldown_seconds == 0
+	config.action_class == "NON_DISRUPTIVE"
+}
+
+test_effect_taxonomy_suppress_alarm if {
+	config := effect_taxonomy["suppress_alarm"]
+	config.base_risk == 5
+	config.cooldown_seconds == 60
+	config.action_class == "NON_DISRUPTIVE"
+}
+
+test_effect_taxonomy_audit_flag if {
+	config := effect_taxonomy["audit_flag"]
+	config.base_risk == 0
+	config.action_class == "NON_DISRUPTIVE"
+}
+
+# --- Merge Taxonomy ---
+test_merge_taxonomy if {
+	platform_tax := {"notify": {"base_risk": 0, "cooldown_seconds": 0, "action_class": "NON_DISRUPTIVE"}}
+	domain_tax := {"scale_out": {"base_risk": 30, "cooldown_seconds": 300, "action_class": "DISRUPTIVE_BOUNDED"}}
+	merged := merge_taxonomy(platform_tax, domain_tax)
+	merged["notify"].base_risk == 0
+	merged["scale_out"].base_risk == 30
+}
+
+test_merge_taxonomy_domain_overrides if {
+	platform_tax := {"notify": {"base_risk": 0, "cooldown_seconds": 0, "action_class": "NON_DISRUPTIVE"}}
+	domain_tax := {"notify": {"base_risk": 99, "cooldown_seconds": 999, "action_class": "DISRUPTIVE_BOUNDED"}}
+	merged := merge_taxonomy(platform_tax, domain_tax)
+	merged["notify"].base_risk == 99
+	merged["notify"].action_class == "DISRUPTIVE_BOUNDED"
 }
 
 # --- Priority Levels ---
@@ -87,8 +117,9 @@ test_coalesce_map_with_null if {
 
 # --- Get Effect Config ---
 test_get_effect_config_known if {
-	config := get_effect_config("scale_out")
-	config.base_risk == 30
+	config := get_effect_config("notify")
+	config.base_risk == 0
+	config.action_class == "NON_DISRUPTIVE"
 }
 
 test_get_effect_config_unknown if {

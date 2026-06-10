@@ -1,0 +1,11 @@
+{
+  "scale_out":          {"base_risk": 30, "cooldown_seconds": 300, "action_class": "DISRUPTIVE_BOUNDED"},
+  "scale_in":           {"base_risk": 50, "cooldown_seconds": 300, "action_class": "DISRUPTIVE_BOUNDED"},
+  "restart_workload":   {"base_risk": 70, "cooldown_seconds": 600, "action_class": "DISRUPTIVE_UNBOUNDED"},
+  "drain_node":         {"base_risk": 80, "cooldown_seconds": 900, "action_class": "DISRUPTIVE_UNBOUNDED"},
+  "config_update":      {"base_risk": 20, "cooldown_seconds": 60,  "action_class": "NON_DISRUPTIVE"},
+  "failover":           {"base_risk": 85, "cooldown_seconds": 900, "action_class": "DISRUPTIVE_UNBOUNDED"},
+  "migrate_workload":   {"base_risk": 75, "cooldown_seconds": 600, "action_class": "DISRUPTIVE_BOUNDED"},
+  "provision_workload":  {"base_risk": 40, "cooldown_seconds": 120, "action_class": "DISRUPTIVE_BOUNDED"},
+  "deprovision_workload": {"base_risk": 60, "cooldown_seconds": 300, "action_class": "DISRUPTIVE_UNBOUNDED"}
+}

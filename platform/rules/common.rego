@@ -10,21 +10,28 @@ import future.keywords.if
 # and safe value coalescing.
 
 # -------------------------------------------
-# Effect Taxonomy — base risk, cooldown, action_class
+# Effect Taxonomy — PLATFORM effects only
 # -------------------------------------------
+# Domain-specific effects (scale_out, restart_workload, etc.) are defined
+# in each domain bundle's taxonomy.json. Use merge_taxonomy() to combine
+# platform + domain taxonomies before lookups.
 
 effect_taxonomy := {
-	"scale_out":          {"base_risk": 30, "cooldown_seconds": 300,  "action_class": "DISRUPTIVE_BOUNDED"},
-	"scale_in":           {"base_risk": 50, "cooldown_seconds": 300,  "action_class": "DISRUPTIVE_BOUNDED"},
-	"restart_workload":   {"base_risk": 70, "cooldown_seconds": 600,  "action_class": "DISRUPTIVE_UNBOUNDED"},
-	"drain_node":         {"base_risk": 80, "cooldown_seconds": 900,  "action_class": "DISRUPTIVE_UNBOUNDED"},
-	"config_update":      {"base_risk": 20, "cooldown_seconds": 60,   "action_class": "NON_DISRUPTIVE"},
 	"notify":             {"base_risk": 0,  "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"},
 	"deny":               {"base_risk": 10, "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"},
 	"allow":              {"base_risk": 0,  "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"},
 	"open_ticket":        {"base_risk": 5,  "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"},
 	"suppress_alarm":     {"base_risk": 5,  "cooldown_seconds": 60,   "action_class": "NON_DISRUPTIVE"},
 	"audit_flag":         {"base_risk": 0,  "cooldown_seconds": 0,    "action_class": "NON_DISRUPTIVE"},
+}
+
+# -------------------------------------------
+# Merge taxonomy — domain overrides platform
+# -------------------------------------------
+# Usage: merge_taxonomy(data.mace.platform.effect_taxonomy, data.mace.cnf.domain.taxonomy)
+
+merge_taxonomy(platform_tax, domain_tax) := merged if {
+	merged := object.union(platform_tax, domain_tax)
 }
 
 # -------------------------------------------

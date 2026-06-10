@@ -7,7 +7,8 @@ import future.keywords.if
 # ============================================
 # Tests mock cross-layer data using `with` statements:
 #   - data.mace.platform.effect_routing
-#   - data.mace.platform.effect_taxonomy
+#   - data.mace.platform.effect_taxonomy (platform effects only)
+#   - data.mace.cnf.domain.taxonomy    (domain effects only)
 #   - data.mace.platform.priority_levels
 #   - data.mace.cnf.operator.limits
 #   - data.mace.cnf.tenants
@@ -31,15 +32,21 @@ mock_domain_routing := {
 	"drain_node":       {"executor": "cnf-manager", "scope": "GLOBAL"},
 }
 
-mock_taxonomy := {
+mock_platform_taxonomy := {
+	"notify":             {"base_risk": 0,  "cooldown_seconds": 0,   "action_class": "NON_DISRUPTIVE"},
+	"deny":               {"base_risk": 10, "cooldown_seconds": 0,   "action_class": "NON_DISRUPTIVE"},
+	"allow":              {"base_risk": 0,  "cooldown_seconds": 0,   "action_class": "NON_DISRUPTIVE"},
+	"open_ticket":        {"base_risk": 5,  "cooldown_seconds": 0,   "action_class": "NON_DISRUPTIVE"},
+	"suppress_alarm":     {"base_risk": 5,  "cooldown_seconds": 60,  "action_class": "NON_DISRUPTIVE"},
+	"audit_flag":         {"base_risk": 0,  "cooldown_seconds": 0,   "action_class": "NON_DISRUPTIVE"},
+}
+
+mock_domain_taxonomy := {
 	"scale_out":          {"base_risk": 30, "cooldown_seconds": 300, "action_class": "DISRUPTIVE_BOUNDED"},
 	"scale_in":           {"base_risk": 50, "cooldown_seconds": 300, "action_class": "DISRUPTIVE_BOUNDED"},
 	"restart_workload":   {"base_risk": 70, "cooldown_seconds": 600, "action_class": "DISRUPTIVE_UNBOUNDED"},
 	"drain_node":         {"base_risk": 80, "cooldown_seconds": 900, "action_class": "DISRUPTIVE_UNBOUNDED"},
 	"config_update":      {"base_risk": 20, "cooldown_seconds": 60,  "action_class": "NON_DISRUPTIVE"},
-	"notify":             {"base_risk": 0,  "cooldown_seconds": 0,   "action_class": "NON_DISRUPTIVE"},
-	"deny":               {"base_risk": 10, "cooldown_seconds": 0,   "action_class": "NON_DISRUPTIVE"},
-	"allow":              {"base_risk": 0,  "cooldown_seconds": 0,   "action_class": "NON_DISRUPTIVE"},
 }
 
 mock_priority_levels := {"critical": 1, "high": 2, "normal": 5, "medium": 5, "low": 10}
@@ -75,7 +82,8 @@ evaluate_with_mocks(action_input) := result if {
 	result := data.mace.cnf.domain.evaluate
 		with input as action_input
 		with data.mace.platform.effect_routing as mock_platform_routing
-		with data.mace.platform.effect_taxonomy as mock_taxonomy
+		with data.mace.platform.effect_taxonomy as mock_platform_taxonomy
+		with data.mace.cnf.domain.taxonomy as mock_domain_taxonomy
 		with data.mace.platform.priority_levels as mock_priority_levels
 		with data.mace.cnf.domain.effect_routing as mock_domain_routing
 		with data.mace.cnf.domain.meta as mock_meta
