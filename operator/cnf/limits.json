@@ -1,5 +1,7 @@
 {
-  "max_replicas_per_tenant": 4,
-  "max_risk_score": 90,
-  "bypass_priorities": [1]
+  "bypass_priorities": [
+    1
+  ],
+  "max_replicas_per_tenant": 1,
+  "max_risk_score": 90
 }
