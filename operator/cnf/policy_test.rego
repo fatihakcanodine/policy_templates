@@ -277,3 +277,216 @@ test_reason_for_always_succeed if {
 	result.status == "SUCCEEDED"
 	contains(result.reason, "auto-succeed")
 }
+
+# -------------------------------------------
+# Additional Test Scenarios
+# -------------------------------------------
+
+# 1. scale_in with normal risk (risk_score=50)
+test_scale_in_succeeds if {
+	result := execute_with_mocks({
+		"effect_type": "scale_in",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"priority": "normal",
+		"risk_score": 50,
+	})
+	result.status == "SUCCEEDED"
+}
+
+# 2. drain_node with risk below threshold (risk_score=80)
+test_drain_node_succeeds if {
+	result := execute_with_mocks({
+		"effect_type": "drain_node",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"priority": "normal",
+		"risk_score": 80,
+	})
+	result.status == "SUCCEEDED"
+}
+
+# 3. drain_node with risk_score=95 (exceeds max_risk_score=90)
+test_drain_node_high_risk_fails if {
+	result := execute_with_mocks({
+		"effect_type": "drain_node",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"priority": "normal",
+		"risk_score": 95,
+	})
+	result.status == "FAILED"
+}
+
+# 4. risk_score=90 FAILS (>= is the threshold)
+test_risk_90_is_boundary if {
+	result := execute_with_mocks({
+		"effect_type": "drain_node",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"priority": "normal",
+		"risk_score": 90,
+	})
+	result.status == "FAILED"
+}
+
+# 5. very low risk (risk_score=1)
+test_risk_1_succeeds if {
+	result := execute_with_mocks({
+		"effect_type": "scale_out",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"priority": "normal",
+		"risk_score": 1,
+	})
+	result.status == "SUCCEEDED"
+}
+
+# 6. critical (priority=1) bypasses risk=95
+test_critical_priority_bypasses_95 if {
+	result := execute_with_mocks({
+		"effect_type": "scale_out",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"priority": 1,
+		"risk_score": 95,
+	})
+	result.status == "SUCCEEDED"
+}
+
+# 7. priority=2 (high) does NOT bypass risk=95, should FAIL
+test_high_priority_does_not_bypass if {
+	result := execute_with_mocks({
+		"effect_type": "scale_out",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"priority": 2,
+		"risk_score": 95,
+	})
+	result.status == "FAILED"
+}
+
+# 8. verify result.effect_type matches input.effect_type
+test_effect_type_preserved if {
+	result := execute_with_mocks({
+		"effect_type": "restart_workload",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"priority": "normal",
+		"risk_score": 30,
+	})
+	result.effect_type == "restart_workload"
+}
+
+# 9. no priority field, risk=50, should SUCCEEDED
+test_no_priority_normal_execution if {
+	result := execute_with_mocks({
+		"effect_type": "scale_out",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"risk_score": 50,
+	})
+	result.status == "SUCCEEDED"
+}
+
+# 10. priority="normal" (not in bypass_priorities=[1]), risk=50, should SUCCEEDED
+test_string_priority_normal if {
+	result := execute_with_mocks({
+		"effect_type": "scale_out",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"priority": "normal",
+		"risk_score": 50,
+	})
+	result.status == "SUCCEEDED"
+}
+
+# 11. notify with risk=99 should still SUCCEEDED
+test_notify_always_succeeds_high_risk if {
+	result := execute_with_mocks({
+		"effect_type": "notify",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"priority": "normal",
+		"risk_score": 99,
+	})
+	result.status == "SUCCEEDED"
+}
+
+# 12. allow with risk=99 should still SUCCEEDED
+test_allow_always_succeeds_high_risk if {
+	result := execute_with_mocks({
+		"effect_type": "allow",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"priority": "normal",
+		"risk_score": 99,
+	})
+	result.status == "SUCCEEDED"
+}
+
+# 13. drain_node with risk=89 (just below threshold)
+test_drain_node_risk_89_succeeds if {
+	result := execute_with_mocks({
+		"effect_type": "drain_node",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"priority": "normal",
+		"risk_score": 89,
+	})
+	result.status == "SUCCEEDED"
+}
+
+# 14. config_update with low risk
+test_config_update_risk_20_succeeds if {
+	result := execute_with_mocks({
+		"effect_type": "config_update",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"priority": "normal",
+		"risk_score": 20,
+	})
+	result.status == "SUCCEEDED"
+}
+
+# 15. empty string effect_type should FAILED (not known, not always-succeed)
+test_empty_effect_type if {
+	result := execute_with_mocks({
+		"effect_type": "",
+		"effect_key": "test-key",
+		"tenant_id": "enterprise-x",
+		"plan_id": "plan-1",
+		"incident_id": "inc-1",
+		"priority": "normal",
+		"risk_score": 30,
+	})
+	result.status == "FAILED"
+}
