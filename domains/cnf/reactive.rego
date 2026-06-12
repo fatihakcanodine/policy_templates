@@ -152,23 +152,42 @@ reactive_action_authorized(effect_type) if {
 # -------------------------------------------
 # Replica limit check for reactive scale effects
 # -------------------------------------------
+# Note: replica_within_limits() expects total target_replicas, not delta.
+# For reactive rules we pass delta (incremental), so we check directly:
+#   delta <= tenant max_replicas AND delta <= operator max_replicas_per_tenant
 
 reactive_replica_within_limits(rule) if {
 	rule.action.effect_type == "scale_out"
 	delta := object.get(rule.action.params, "delta", 2)
-	replica_within_limits(delta)
+	delta <= reactive_max_replica_limit
 }
 
 reactive_replica_within_limits(rule) if {
 	rule.action.effect_type == "scale_in"
 	delta := object.get(rule.action.params, "delta", 1)
-	replica_within_limits(delta)
+	delta <= reactive_max_replica_limit
 }
 
 reactive_replica_within_limits(rule) if {
 	rule.action.effect_type != "scale_out"
 	rule.action.effect_type != "scale_in"
 }
+
+# Resolve the effective replica limit: min(tenant max_replicas, operator max_replicas_per_tenant)
+reactive_max_replica_limit := min_limit if {
+	tenant_max := object.get(tenant_constraints, "max_replicas", operator_limits.max_replicas_per_tenant)
+	op_max := operator_limits.max_replicas_per_tenant
+	min_limit := min_of(tenant_max, op_max)
+}
+
+# Fallback when no tenant constraints
+reactive_max_replica_limit := operator_limits.max_replicas_per_tenant if {
+	not tenant_constraints.max_replicas
+}
+
+# Min helper
+min_of(a, b) := a if { a <= b }
+min_of(a, b) := b if { b < a }
 
 # -------------------------------------------
 # REACTIVE EFFECT GENERATION
