@@ -1,0 +1,8 @@
+{
+  "rules": [
+    {
+      "id": "nginx-fallback",
+      "enabled": false
+    }
+  ]
+}

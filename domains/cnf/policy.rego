@@ -379,10 +379,22 @@ effects := [e |
 	e := effect[k]
 ]
 
+# -------------------------------------------
+# PRODUCER RESULT — dual mode
+# -------------------------------------------
+
+# Reactive mode: input.event present → event-triggered evaluation
+evaluate := reactive_evaluate if {
+	input.event
+}
+
+# Request-driven mode: existing behavior (no input.event)
 evaluate := {
 	"effects": effects,
 	"source": object.get(input, "source", "unknown"),
 	"tenant_id": object.get(input, "tenant_id", "default"),
 	"incident_id": object.get(input, "incident_id", ""),
 	"policy_revision": object.get(data.mace.cnf.domain.meta, "policy_revision", "unknown"),
+} if {
+	not input.event
 }

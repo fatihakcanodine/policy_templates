@@ -1,0 +1,28 @@
+{
+  "rules": [
+    {
+      "id": "nginx-fallback",
+      "description": "When nginx-app scales down, scale up nginx-2-app",
+      "enabled": true,
+      "trigger": {
+        "kind": "Deployment",
+        "name": "mace-dummy-nginx-app",
+        "reason": "ScalingReplicaSet",
+        "condition": {
+          "field": "replicas",
+          "operator": "lte",
+          "value": 1
+        }
+      },
+      "action": {
+        "effect_type": "scale_out",
+        "target": {
+          "name": "mace-dummy-nginx-2-app"
+        },
+        "params": {
+          "delta": 2
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "rules": [
+    {
+      "id": "nginx-fallback",
+      "description": "enterprise-x: nginx-app düştüğünde +3 replica",
+      "trigger": {
+        "kind": "Deployment",
+        "name": "mace-dummy-nginx-app",
+        "reason": "ScalingReplicaSet",
+        "condition": {
+          "field": "replicas",
+          "operator": "lte",
+          "value": 2
+        }
+      },
+      "action": {
+        "effect_type": "scale_out",
+        "target": {
+          "name": "mace-dummy-nginx-2-app"
+        },
+        "params": {
+          "delta": 3
+        }
+      }
+    }
+  ]
+}
